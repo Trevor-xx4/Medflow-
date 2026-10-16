@@ -1,0 +1,257 @@
+-- ==============================================================================
+-- MedFlow: Smart Hospital Resource & Process Management System
+-- DBMS Module: Oracle Relational Database DDL Schema (11g & 12c+ Compatible)
+-- 
+-- Academic Notes for DBMS Viva:
+-- 1. Normalization: 3rd Normal Form (3NF) to eliminate data redundancy.
+-- 2. Constraints: Primary Keys (PK), Foreign Keys (FK) with CASCADE, CHECK constraints.
+-- 3. Oracle Architecture: Uses Sequences and BEFORE INSERT Triggers for PK auto-generation.
+-- ==============================================================================
+
+-- 1. CLEANUP (Drop tables and sequences in reverse dependency order)
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE DEADLOCK_AUDIT_LOGS CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE RESOURCE_ALLOCATIONS CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE TREATMENTS CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE APPOINTMENTS CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE HOSPITAL_RESOURCES CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE DOCTORS CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+BEGIN
+    EXECUTE IMMEDIATE 'DROP TABLE PATIENTS CASCADE CONSTRAINTS';
+EXCEPTION WHEN OTHERS THEN NULL;
+END;
+/
+
+-- Drop Sequences
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_PATIENT_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_DOCTOR_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_RESOURCE_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_APPOINTMENT_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_TREATMENT_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_ALLOCATION_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+BEGIN EXECUTE IMMEDIATE 'DROP SEQUENCE SEQ_LOG_ID'; EXCEPTION WHEN OTHERS THEN NULL; END;
+/
+
+-- ==============================================================================
+-- CREATE SEQUENCES FOR AUTO-INCREMENT PRIMARY KEYS (11g Standard)
+-- ==============================================================================
+CREATE SEQUENCE SEQ_PATIENT_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE SEQ_DOCTOR_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE SEQ_RESOURCE_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE SEQ_APPOINTMENT_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE SEQ_TREATMENT_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE SEQ_ALLOCATION_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+CREATE SEQUENCE SEQ_LOG_ID START WITH 1 INCREMENT BY 1 NOCACHE;
+
+-- ==============================================================================
+-- TABLE 1: PATIENTS
+-- Purpose: Holds admitted patient demographics and triage priority.
+-- OS Mapping: Each patient is a potential "Process" waiting for CPU/Resource service.
+-- ==============================================================================
+CREATE TABLE PATIENTS (
+    PATIENT_ID          NUMBER(10) PRIMARY KEY,
+    FULL_NAME           VARCHAR2(100) NOT NULL,
+    AGE                 NUMBER(3) NOT NULL,
+    GENDER              VARCHAR2(10) CHECK (GENDER IN ('Male', 'Female', 'Other')),
+    CONTACT_NUMBER      VARCHAR2(15),
+    -- Triage Priority: 1 = Emergency (Highest), 2 = Urgent, 3 = Routine (Lowest)
+    PRIORITY_LEVEL      NUMBER(1) DEFAULT 3 CHECK (PRIORITY_LEVEL IN (1, 2, 3)),
+    ADMISSION_STATUS    VARCHAR2(20) DEFAULT 'Admitted' CHECK (ADMISSION_STATUS IN ('Admitted', 'In-Treatment', 'Discharged')),
+    CREATED_AT          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE TRIGGER TRG_PATIENTS_BI
+BEFORE INSERT ON PATIENTS
+FOR EACH ROW
+BEGIN
+    IF :NEW.PATIENT_ID IS NULL THEN
+        SELECT SEQ_PATIENT_ID.NEXTVAL INTO :NEW.PATIENT_ID FROM DUAL;
+    END IF;
+END;
+/
+
+-- ==============================================================================
+-- TABLE 2: DOCTORS
+-- Purpose: Holds medical staff details and departments.
+-- ==============================================================================
+CREATE TABLE DOCTORS (
+    DOCTOR_ID           NUMBER(10) PRIMARY KEY,
+    FULL_NAME           VARCHAR2(100) NOT NULL,
+    SPECIALIZATION      VARCHAR2(80) NOT NULL,
+    DEPARTMENT          VARCHAR2(80) NOT NULL,
+    AVAILABILITY_STATUS VARCHAR2(20) DEFAULT 'Available' CHECK (AVAILABILITY_STATUS IN ('Available', 'Busy', 'On-Leave')),
+    CREATED_AT          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE TRIGGER TRG_DOCTORS_BI
+BEFORE INSERT ON DOCTORS
+FOR EACH ROW
+BEGIN
+    IF :NEW.DOCTOR_ID IS NULL THEN
+        SELECT SEQ_DOCTOR_ID.NEXTVAL INTO :NEW.DOCTOR_ID FROM DUAL;
+    END IF;
+END;
+/
+
+-- ==============================================================================
+-- TABLE 3: HOSPITAL_RESOURCES
+-- Purpose: Tracks scarce medical assets (ICU beds, ventilators, operation theaters).
+-- OS Mapping: Corresponds to "Resource Types" in Operating Systems.
+-- ==============================================================================
+CREATE TABLE HOSPITAL_RESOURCES (
+    RESOURCE_ID         NUMBER(10) PRIMARY KEY,
+    RESOURCE_NAME       VARCHAR2(50) NOT NULL UNIQUE, -- e.g., 'ICU_BED', 'VENTILATOR', 'OPERATION_THEATER'
+    TOTAL_UNITS         NUMBER(5) NOT NULL CHECK (TOTAL_UNITS >= 0),
+    AVAILABLE_UNITS     NUMBER(5) NOT NULL CHECK (AVAILABLE_UNITS >= 0),
+    LOCATION_BLOCK      VARCHAR2(50),
+    LAST_UPDATED        TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE OR REPLACE TRIGGER TRG_RESOURCES_BI
+BEFORE INSERT ON HOSPITAL_RESOURCES
+FOR EACH ROW
+BEGIN
+    IF :NEW.RESOURCE_ID IS NULL THEN
+        SELECT SEQ_RESOURCE_ID.NEXTVAL INTO :NEW.RESOURCE_ID FROM DUAL;
+    END IF;
+END;
+/
+
+-- ==============================================================================
+-- TABLE 4: APPOINTMENTS
+-- Purpose: Links patients with doctors for consultations.
+-- ==============================================================================
+CREATE TABLE APPOINTMENTS (
+    APPOINTMENT_ID      NUMBER(10) PRIMARY KEY,
+    PATIENT_ID          NUMBER(10) NOT NULL,
+    DOCTOR_ID           NUMBER(10) NOT NULL,
+    APPOINTMENT_TIME    TIMESTAMP NOT NULL,
+    STATUS              VARCHAR2(20) DEFAULT 'Scheduled' CHECK (STATUS IN ('Scheduled', 'Completed', 'Cancelled')),
+    CONSTRAINT FK_APPOINTMENT_PATIENT FOREIGN KEY (PATIENT_ID) REFERENCES PATIENTS(PATIENT_ID) ON DELETE CASCADE,
+    CONSTRAINT FK_APPOINTMENT_DOCTOR FOREIGN KEY (DOCTOR_ID) REFERENCES DOCTORS(DOCTOR_ID) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE TRIGGER TRG_APPOINTMENTS_BI
+BEFORE INSERT ON APPOINTMENTS
+FOR EACH ROW
+BEGIN
+    IF :NEW.APPOINTMENT_ID IS NULL THEN
+        SELECT SEQ_APPOINTMENT_ID.NEXTVAL INTO :NEW.APPOINTMENT_ID FROM DUAL;
+    END IF;
+END;
+/
+
+-- ==============================================================================
+-- TABLE 5: TREATMENTS
+-- Purpose: Medical treatment assigned to a patient.
+-- OS Mapping: This is the concrete "Process" scheduled by FCFS, Priority, or Round Robin.
+-- BURST_TIME_MINUTES = CPU Burst Time, ARRIVAL_TIME = Process Arrival Time.
+-- ==============================================================================
+CREATE TABLE TREATMENTS (
+    TREATMENT_ID        NUMBER(10) PRIMARY KEY,
+    PATIENT_ID          NUMBER(10) NOT NULL,
+    DOCTOR_ID           NUMBER(10) NOT NULL,
+    TREATMENT_TYPE      VARCHAR2(100) NOT NULL,
+    BURST_TIME_MINUTES  NUMBER(5) NOT NULL CHECK (BURST_TIME_MINUTES > 0), -- Burst Time
+    ARRIVAL_TIME        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,                -- Arrival Time
+    SCHEDULE_STATUS     VARCHAR2(20) DEFAULT 'Pending' CHECK (SCHEDULE_STATUS IN ('Pending', 'Running', 'Completed')),
+    CONSTRAINT FK_TREATMENT_PATIENT FOREIGN KEY (PATIENT_ID) REFERENCES PATIENTS(PATIENT_ID) ON DELETE CASCADE,
+    CONSTRAINT FK_TREATMENT_DOCTOR FOREIGN KEY (DOCTOR_ID) REFERENCES DOCTORS(DOCTOR_ID) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE TRIGGER TRG_TREATMENTS_BI
+BEFORE INSERT ON TREATMENTS
+FOR EACH ROW
+BEGIN
+    IF :NEW.TREATMENT_ID IS NULL THEN
+        SELECT SEQ_TREATMENT_ID.NEXTVAL INTO :NEW.TREATMENT_ID FROM DUAL;
+    END IF;
+END;
+/
+
+-- ==============================================================================
+-- TABLE 6: RESOURCE_ALLOCATIONS
+-- Purpose: Tracks resource claims per treatment.
+-- OS Mapping: Represents the Allocation and Max Claim matrices for Banker's Algorithm.
+-- ==============================================================================
+CREATE TABLE RESOURCE_ALLOCATIONS (
+    ALLOCATION_ID       NUMBER(10) PRIMARY KEY,
+    TREATMENT_ID        NUMBER(10) NOT NULL,
+    RESOURCE_ID         NUMBER(10) NOT NULL,
+    UNITS_ALLOCATED     NUMBER(4) DEFAULT 0 CHECK (UNITS_ALLOCATED >= 0),
+    MAX_UNITS_CLAIMED   NUMBER(4) NOT NULL CHECK (MAX_UNITS_CLAIMED >= 0),
+    ALLOCATION_TIME     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT CHK_MAX_CLAIM CHECK (MAX_UNITS_CLAIMED >= UNITS_ALLOCATED),
+    CONSTRAINT FK_ALLOCATION_TREATMENT FOREIGN KEY (TREATMENT_ID) REFERENCES TREATMENTS(TREATMENT_ID) ON DELETE CASCADE,
+    CONSTRAINT FK_ALLOCATION_RESOURCE FOREIGN KEY (RESOURCE_ID) REFERENCES HOSPITAL_RESOURCES(RESOURCE_ID) ON DELETE CASCADE
+);
+
+CREATE OR REPLACE TRIGGER TRG_ALLOCATIONS_BI
+BEFORE INSERT ON RESOURCE_ALLOCATIONS
+FOR EACH ROW
+BEGIN
+    IF :NEW.ALLOCATION_ID IS NULL THEN
+        SELECT SEQ_ALLOCATION_ID.NEXTVAL INTO :NEW.ALLOCATION_ID FROM DUAL;
+    END IF;
+END;
+/
+
+-- ==============================================================================
+-- TABLE 7: DEADLOCK_AUDIT_LOGS
+-- Purpose: Logs results of Banker's safety checks and deadlock detection.
+-- OS Mapping: Records safe sequences (e.g. T2 -> T3 -> T1 -> T4) or unsafe warnings.
+-- ==============================================================================
+CREATE TABLE DEADLOCK_AUDIT_LOGS (
+    LOG_ID              NUMBER(10) PRIMARY KEY,
+    CHECK_TIMESTAMP     TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    IS_SAFE_STATE       NUMBER(1) CHECK (IS_SAFE_STATE IN (0, 1)), -- 1 = Safe, 0 = Unsafe
+    SAFE_SEQUENCE       VARCHAR2(255),                            -- e.g., 'T2 -> T3 -> T1 -> T4'
+    AUDIT_NOTE          VARCHAR2(255)
+);
+
+CREATE OR REPLACE TRIGGER TRG_LOGS_BI
+BEFORE INSERT ON DEADLOCK_AUDIT_LOGS
+FOR EACH ROW
+BEGIN
+    IF :NEW.LOG_ID IS NULL THEN
+        SELECT SEQ_LOG_ID.NEXTVAL INTO :NEW.LOG_ID FROM DUAL;
+    END IF;
+END;
+/
+
+COMMIT;

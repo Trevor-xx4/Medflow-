@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MedFlow: SchedulerService.java Complete Line-by-Line Guide</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 18mm 14mm 18mm 14mm;
+            @bottom-right {
+                content: counter(page);
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.55;
+            color: #1e293b;
+            background-color: #ffffff;
+            font-size: 13px;
+            margin: 0;
+            padding: 0;
+        }
+        .header-box {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+            color: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+        }
+        .header-box h1 {
+            margin: 0 0 8px 0;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        .header-box p {
+            margin: 0;
+            font-size: 13px;
+            opacity: 0.95;
+        }
+        h2 {
+            color: #0369a1;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 6px;
+            margin-top: 28px;
+            margin-bottom: 14px;
+            font-size: 18px;
+            page-break-after: avoid;
+        }
+        h3 {
+            color: #0f172a;
+            margin-top: 20px;
+            margin-bottom: 8px;
+            font-size: 15px;
+            page-break-after: avoid;
+        }
+        .meta-badge {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            margin-right: 6px;
+            margin-bottom: 8px;
+        }
+        .code-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 12px 0 20px 0;
+            font-size: 12px;
+            page-break-inside: auto;
+        }
+        .code-table tr {
+            page-break-inside: avoid;
+            page-break-after: auto;
+        }
+        .code-table th {
+            background-color: #f1f5f9;
+            color: #334155;
+            font-weight: 600;
+            text-align: left;
+            padding: 8px 10px;
+            border: 1px solid #cbd5e1;
+            font-size: 12px;
+        }
+        .code-table td {
+            padding: 8px 10px;
+            border: 1px solid #e2e8f0;
+            vertical-align: top;
+        }
+        .line-num {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            color: #64748b;
+            width: 55px;
+            text-align: center;
+            background-color: #f8fafc;
+        }
+        .code-cell {
+            font-family: Consolas, "Courier New", Courier, monospace;
+            background-color: #f8fafc;
+            color: #0f172a;
+            white-space: pre-wrap;
+            width: 42%;
+            font-size: 11.5px;
+            line-height: 1.4;
+        }
+        .expl-cell {
+            color: #334155;
+            width: 50%;
+            line-height: 1.45;
+        }
+        .viva-box {
+            background-color: #fefce8;
+            border-left: 4px solid #eab308;
+            padding: 12px 14px;
+            border-radius: 4px;
+            margin: 14px 0;
+            font-size: 12.5px;
+            page-break-inside: avoid;
+        }
+        .viva-box strong {
+            color: #854d0e;
+        }
+        .formula-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 10px 14px;
+            border-radius: 4px;
+            margin: 12px 0;
+            font-size: 12px;
+            page-break-inside: avoid;
+        }
+        .formula-box strong {
+            color: #166534;
+        }
+        .gantt-preview {
+            background-color: #f1f5f9;
+            border: 1px dashed #94a3b8;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: Consolas, monospace;
+            font-size: 11px;
+            margin: 8px 0 14px 0;
+            overflow-x: auto;
+        }
+        .keyword { color: #0284c7; font-weight: bold; }
+        .comment { color: #64748b; font-style: italic; }
+        .string { color: #16a34a; }
+        .number { color: #ea580c; }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header-box">
+        <h1>MedFlow: Comprehensive Line-by-Line Guide</h1>
+        <p><strong>File:</strong> <code>src/main/java/com/medflow/simulation/scheduler/SchedulerService.java</code> (586 Lines)</p>
+        <p><strong>Purpose:</strong> CPU Process Scheduling Algorithms (FCFS, Priority Triage, Round Robin, SRTF) adapted for Hospital Emergency Operations.</p>
+    </div>
+
+    <div class="viva-box">
+        <strong>🎓 Master Viva Hook (Say this in your exam):</strong><br>
+        <em>"Sir/Ma'am, in a hospital, specialized resources like surgeons and operation theaters are strictly finite, exactly like CPU cores. Treatments are processes characterized by an Arrival Time ($AT$), Burst Time ($BT$), and Triage Priority. <code>SchedulerService.java</code> is our core operating system engine that schedules treatments and objectively measures average Waiting Time ($WT$) and Turnaround Time ($TAT$)."</em>
+    </div>
+
+    <div class="formula-box">
+        <strong>📐 Universal Scheduling Mathematical Formulas:</strong><br>
+        1. <strong>Completion Time ($CT$):</strong> Timestamp when the process completely finishes execution.<br>
+        2. <strong>Turnaround Time ($TAT$):</strong> Total duration from arrival to completion: <code>TAT = CT - AT</code><br>
+        3. <strong>Waiting Time ($WT$):</strong> Pure idle duration spent in ready queue: <code>WT = TAT - BT</code><br>
+        4. <strong>Average Metrics:</strong> <code>Avg WT = &Sigma;(WT) / N</code>, &nbsp; <code>Avg TAT = &Sigma;(TAT) / N</code>
+    </div>
+
+    <!-- SECTION 1 -->
+    <h2>Section 1: Package, Imports & Class Header (Lines 1 – 41)</h2>
+    <p>Sets up the Spring Boot service container, DTO dependencies, and core scheduling documentation.</p>
+
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th class="line-num">Line(s)</th>
+                <th>Java Source Code</th>
+                <th>Detailed Line-by-Line Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="line-num">1</td>
+                <td class="code-cell">package com.medflow.simulation.scheduler;</td>
+                <td class="expl-cell">Declares the Java package. Groups this service under the simulation module, keeping OS scheduling cleanly isolated from DB controllers.</td>
+            </tr>
+            <tr>
+                <td class="line-num">3–6</td>
+                <td class="code-cell">import com.medflow.dto.GanttBlockDto;
+import com.medflow.dto.ProcessTaskDto;
+import com.medflow.dto.ScheduleResponseDto;
+import org.springframework.stereotype.Service;</td>
+                <td class="expl-cell">
+                    <strong>Imports:</strong><br>
+                    &bull; <code>GanttBlockDto</code>: Models a single time-slice block on the Gantt chart timeline.<br>
+                    &bull; <code>ProcessTaskDto</code>: Models incoming patient processes (AT, BT, Priority).<br>
+                    &bull; <code>ScheduleResponseDto</code>: Wrapper returning the computed Gantt list, Avg WT, and Avg TAT.<br>
+                    &bull; <code>@Service</code>: Spring stereotype marking this class as an injectable business logic service.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">8</td>
+                <td class="code-cell">import java.util.*;</td>
+                <td class="expl-cell">Imports Java collections: <code>List</code>, <code>ArrayList</code>, <code>Queue</code>, <code>LinkedList</code>, <code>Comparator</code>.</td>
+            </tr>
+            <tr>
+                <td class="line-num">10–39</td>
+                <td class="code-cell">/** Javadoc documentation ... */</td>
+                <td class="expl-cell">Academic class-level documentation defining the OS-to-Hospital mapping and mathematical formulas for examiners.</td>
+            </tr>
+            <tr>
+                <td class="line-num">40–41</td>
+                <td class="code-cell">@Service
+public class SchedulerService {</td>
+                <td class="expl-cell">
+                    <code>@Service</code> tells the Spring IoC container to instantiate a singleton instance at startup and inject it into <code>SimulationController</code>.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- SECTION 2 -->
+    <h2>Section 2: First-Come, First-Served (FCFS) (Lines 43 – 105)</h2>
+    <p><span class="meta-badge">Non-Preemptive</span> <span class="meta-badge">FIFO Queue</span> Routine walk-in consultations.</p>
+
+    <div class="gantt-preview">
+        FCFS Gantt: [0--T1 (45m)--45] [45--T2 (30m)--75] [75--T3 (20m)--95] [95--T4 (50m)--145]<br>
+        Avg WT: 41.25 min | Avg TAT: 77.50 min
+    </div>
+
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th class="line-num">Line(s)</th>
+                <th>Java Source Code</th>
+                <th>Detailed Line-by-Line Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="line-num">54</td>
+                <td class="code-cell">public ScheduleResponseDto scheduleFCFS(List&lt;ProcessTaskDto&gt; tasks) {</td>
+                <td class="expl-cell">Entry point for FCFS algorithm. Accepts list of patient tasks and returns the complete schedule response.</td>
+            </tr>
+            <tr>
+                <td class="line-num">56</td>
+                <td class="code-cell">List&lt;ProcessTaskDto&gt; processList = prepareTasks(tasks);</td>
+                <td class="expl-cell">Calls defensive helper <code>prepareTasks()</code>. If input is null/empty, loads canonical default hospital tasks from <code>oracle_seed.sql</code>.</td>
+            </tr>
+            <tr>
+                <td class="line-num">59</td>
+                <td class="code-cell">processList.sort(Comparator.comparingInt(ProcessTaskDto::getArrivalTime));</td>
+                <td class="expl-cell"><strong>The Core FCFS Rule:</strong> Sorts all processes strictly by Arrival Time ascending. Whichever patient arrives first is scheduled first.</td>
+            </tr>
+            <tr>
+                <td class="line-num">61–64</td>
+                <td class="code-cell">List&lt;GanttBlockDto&gt; ganttChart = new ArrayList&lt;&gt;();
+int currentTime = 0;
+double totalWaitingTime = 0;
+double totalTurnaroundTime = 0;</td>
+                <td class="expl-cell">Initializes the timeline chart, simulation clock (<code>currentTime = 0</code>), and accumulators for statistical averages.</td>
+            </tr>
+            <tr>
+                <td class="line-num">66</td>
+                <td class="code-cell">for (ProcessTaskDto task : processList) {</td>
+                <td class="expl-cell">Loops sequentially through the arrival-sorted processes.</td>
+            </tr>
+            <tr>
+                <td class="line-num">68–76</td>
+                <td class="code-cell">if (currentTime &lt; task.getArrivalTime()) {
+    ganttChart.add(new GanttBlockDto(
+            "IDLE",
+            "Idle (Awaiting Patient)",
+            currentTime,
+            task.getArrivalTime()
+    ));
+    currentTime = task.getArrivalTime();
+}</td>
+                <td class="expl-cell">
+                    <strong>CPU IDLE State Handling:</strong> If the doctor finishes current work at minute 10, but the next patient does not arrive until minute 15, the doctor is IDLE for 5 minutes. Fast-forwards clock to <code>task.getArrivalTime()</code> and logs an IDLE block.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">78–81</td>
+                <td class="code-cell">int startTime = currentTime;
+int endTime = startTime + task.getBurstTime();
+currentTime = endTime;</td>
+                <td class="expl-cell"><strong>Non-Preemptive Execution:</strong> The process runs continuously from <code>startTime</code> until <code>endTime = startTime + BT</code>. The clock advances to <code>endTime</code>.</td>
+            </tr>
+            <tr>
+                <td class="line-num">84–86</td>
+                <td class="code-cell">int completionTime = endTime;
+int turnaroundTime = completionTime - task.getArrivalTime();
+int waitingTime = turnaroundTime - task.getBurstTime();</td>
+                <td class="expl-cell">
+                    <strong>Standard OS Metric Calculations:</strong><br>
+                    &bull; <code>CT = endTime</code><br>
+                    &bull; <code>TAT = CT - AT</code><br>
+                    &bull; <code>WT = TAT - BT</code>
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">87–88</td>
+                <td class="code-cell">totalWaitingTime += waitingTime;
+totalTurnaroundTime += turnaroundTime;</td>
+                <td class="expl-cell">Adds the individual process's WT and TAT to the running totals for later average calculation.</td>
+            </tr>
+            <tr>
+                <td class="line-num">90–92</td>
+                <td class="code-cell">String label = task.getProcessId() + ": " + task.getPatientName() + " (" + task.getBurstTime() + "m)";
+ganttChart.add(new GanttBlockDto(task.getProcessId(), label, startTime, endTime));</td>
+                <td class="expl-cell">Creates a Gantt block for the UI containing process ID, patient name, procedure duration, start, and end times.</td>
+            </tr>
+            <tr>
+                <td class="line-num">94–96</td>
+                <td class="code-cell">int n = processList.size();
+double avgWait = roundTwoDecimals(totalWaitingTime / n);
+double avgTat = roundTwoDecimals(totalTurnaroundTime / n);</td>
+                <td class="expl-cell">Computes average WT and TAT by dividing total sums by total process count $n$, rounded to 2 decimal places.</td>
+            </tr>
+            <tr>
+                <td class="line-num">98–104</td>
+                <td class="code-cell">return new ScheduleResponseDto(
+        "FCFS (First-Come, First-Served)",
+        ganttChart,
+        avgWait,
+        avgTat,
+        "FCFS completed successfully..."
+);</td>
+                <td class="expl-cell">Packages results into response DTO for the REST controller.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 3 -->
+    <h2>Section 3: Priority Scheduling & Emergency Preemption (Lines 107 – 265)</h2>
+    <p><span class="meta-badge">Preemptive & Non-Preemptive</span> <span class="meta-badge">Emergency Triage</span> Emergency (P1) preempts Routine (P3).</p>
+
+    <div class="gantt-preview">
+        Preemptive Priority Gantt: [0--T1 (P1)--45] [45--T4 (P1)--95] [95--T2 (P2)--125] [125--T3 (P3)--145]<br>
+        Avg WT: 53.75 min | Avg TAT: 90.00 min
+    </div>
+
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th class="line-num">Line(s)</th>
+                <th>Java Source Code</th>
+                <th>Detailed Line-by-Line Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="line-num">111–113</td>
+                <td class="code-cell">public ScheduleResponseDto schedulePriority(List&lt;ProcessTaskDto&gt; tasks) {
+    return schedulePriority(tasks, true);
+}</td>
+                <td class="expl-cell">Convenience overload. Defaults to <code>preemptive = true</code> (emergency preemption triage mode).</td>
+            </tr>
+            <tr>
+                <td class="line-num">126</td>
+                <td class="code-cell">public ScheduleResponseDto schedulePriority(List&lt;ProcessTaskDto&gt; tasks, boolean preemptive) {</td>
+                <td class="expl-cell">Configurable priority scheduling method. Supports both preemptive and non-preemptive modes.</td>
+            </tr>
+            <tr>
+                <td class="line-num">131–142</td>
+                <td class="code-cell">class TaskState {
+    final ProcessTaskDto original;
+    final int index;
+    int remainingBurst;
+    int completionTime;
+
+    TaskState(ProcessTaskDto original, int index) {
+        this.original = original;
+        this.index = index;
+        this.remainingBurst = original.getBurstTime();
+    }
+}</td>
+                <td class="expl-cell">
+                    <strong>Simulated Process Control Block (PCB):</strong><br>
+                    Internal class modeling the OS kernel's PCB. Tracks dynamic state without altering original database models:<br>
+                    &bull; <code>remainingBurst</code>: Time units still needed on CPU.<br>
+                    &bull; <code>completionTime</code>: Recorded when remainingBurst reaches 0.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">144–147</td>
+                <td class="code-cell">List&lt;TaskState&gt; states = new ArrayList&lt;&gt;();
+for (int i = 0; i &lt; n; i++) {
+    states.add(new TaskState(processList.get(i), i));
+}</td>
+                <td class="expl-cell">Initializes a PCB state wrapper for every patient treatment in the batch.</td>
+            </tr>
+            <tr>
+                <td class="line-num">149–154</td>
+                <td class="code-cell">int completed = 0;
+int currentTime = states.stream().mapToInt(s -> s.original.getArrivalTime()).min().orElse(0);
+TaskState currentRunning = null;
+int blockStartTime = currentTime;</td>
+                <td class="expl-cell">Initializes simulation loop variables. <code>currentTime</code> starts at earliest patient arrival time. <code>completed</code> tracks how many tasks have finished.</td>
+            </tr>
+            <tr>
+                <td class="line-num">156</td>
+                <td class="code-cell">while (completed &lt; n) {</td>
+                <td class="expl-cell">Main simulation loop. Continues until every single process has finished ($BT_{rem} = 0$).</td>
+            </tr>
+            <tr>
+                <td class="line-num">158–163</td>
+                <td class="code-cell">List&lt;TaskState&gt; available = new ArrayList&lt;&gt;();
+for (TaskState s : states) {
+    if (s.original.getArrivalTime() &lt;= currentTime &amp;&amp; s.remainingBurst &gt; 0) {
+        available.add(s);
+    }
+}</td>
+                <td class="expl-cell"><strong>Ready Queue Filter:</strong> Collects all processes that have already arrived at or before <code>currentTime</code> and still require CPU time.</td>
+            </tr>
+            <tr>
+                <td class="line-num">165–181</td>
+                <td class="code-cell">if (available.isEmpty()) {
+    ... IDLE block logic ...
+    currentTime = nextArrival;
+    continue;
+}</td>
+                <td class="expl-cell">If no process has arrived yet, flushes any currently running slice, records an IDLE block, jumps clock to next arrival, and continues loop.</td>
+            </tr>
+            <tr>
+                <td class="line-num">185–189</td>
+                <td class="code-cell">TaskState highest = available.stream()
+        .min(Comparator.comparingInt((TaskState s) -> s.original.getPriority())
+                .thenComparingInt(s -> s.original.getArrivalTime())
+                .thenComparingInt(s -> s.index))
+        .orElse(available.get(0));</td>
+                <td class="expl-cell">
+                    <strong>Highest Priority Selection:</strong><br>
+                    &bull; Primary Sort: Lowest numerical priority value (1 = Emergency &lt; 2 &lt; 3).<br>
+                    &bull; Tie-Breaker 1: Earlier Arrival Time ($AT$).<br>
+                    &bull; Tie-Breaker 2: Original list insertion index.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">191–205</td>
+                <td class="code-cell">if (!preemptive) {
+    ... runs currentRunning to 0 ...
+    currentTime += currentRunning.remainingBurst;
+    completed++;
+    continue;
+}</td>
+                <td class="expl-cell"><strong>Non-Preemptive Branch:</strong> If preemption is disabled, process is given CPU and executes to completion without interruption.</td>
+            </tr>
+            <tr>
+                <td class="line-num">207–214</td>
+                <td class="code-cell">if (currentRunning != highest) {
+    if (currentRunning != null) {
+        addGanttBlock(ganttChart, currentRunning.original, blockStartTime, currentTime);
+    }
+    currentRunning = highest;
+    blockStartTime = currentTime;
+}</td>
+                <td class="expl-cell"><strong>Context Switch Detection:</strong> If a different process has higher priority than the currently running one, the current process yields, its executed slice is added to Gantt, and <code>highest</code> takes the CPU.</td>
+            </tr>
+            <tr>
+                <td class="line-num">217–228</td>
+                <td class="code-cell">int step = currentRunning.remainingBurst;
+for (TaskState s : states) {
+    if (s.remainingBurst &gt; 0 &amp;&amp; s.original.getArrivalTime() &gt; currentTime) {
+        if (s.original.getPriority() &lt; currentRunning.original.getPriority()) {
+            int timeUntilArrival = s.original.getArrivalTime() - currentTime;
+            if (timeUntilArrival &gt; 0 &amp;&amp; timeUntilArrival &lt; step) {
+                step = timeUntilArrival;
+            }
+        }
+    }
+}</td>
+                <td class="expl-cell">
+                    <strong>Event-Driven Preemption Step (Critical Algorithm):</strong><br>
+                    Rather than incrementing clock 1 by 1 (which is slow), it calculates <code>step</code>: the exact time until the process finishes OR until a higher-priority patient arrives in the future. If a higher priority patient arrives in 10 min and remaining burst is 30 min, <code>step = 10</code>.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">231–232</td>
+                <td class="code-cell">currentTime += step;
+currentRunning.remainingBurst -= step;</td>
+                <td class="expl-cell">Advances clock by <code>step</code> and decrements process's remaining burst time.</td>
+            </tr>
+            <tr>
+                <td class="line-num">234–240</td>
+                <td class="code-cell">if (currentRunning.remainingBurst == 0) {
+    currentRunning.completionTime = currentTime;
+    completed++;
+    addGanttBlock(ganttChart, currentRunning.original, blockStartTime, currentTime);
+    currentRunning = null;
+}</td>
+                <td class="expl-cell">If process has 0 remaining burst, marks <code>completionTime</code>, increments <code>completed</code> count, records Gantt block, and releases CPU.</td>
+            </tr>
+            <tr>
+                <td class="line-num">243–255</td>
+                <td class="code-cell">for (TaskState s : states) {
+    int tat = s.completionTime - s.original.getArrivalTime();
+    int wt = tat - s.original.getBurstTime();
+    totalTurnaroundTime += tat;
+    totalWaitingTime += wt;
+}</td>
+                <td class="expl-cell">Loops over all finished processes to calculate final $TAT$, $WT$, and averages.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 4 -->
+    <h2>Section 4: Round Robin (RR) with Time Quantum (Lines 267 – 403)</h2>
+    <p><span class="meta-badge">Preemptive</span> <span class="meta-badge">Time Slicing</span> Fair physician ward rounds.</p>
+
+    <div class="gantt-preview">
+        RR (q=20) Gantt: [0--T1--20] [20--T2--40] [40--T3 (Done)--60] [60--T1--80] [80--T4--100] [100--T2 (Done)--110] [110--T1 (Done)--115] [115--T4--135] [135--T4 (Done)--145]<br>
+        Avg WT: 58.75 min | Avg TAT: 95.00 min
+    </div>
+
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th class="line-num">Line(s)</th>
+                <th>Java Source Code</th>
+                <th>Detailed Line-by-Line Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="line-num">282–285</td>
+                <td class="code-cell">public ScheduleResponseDto scheduleRoundRobin(List&lt;ProcessTaskDto&gt; tasks, int timeQuantum) {
+    if (timeQuantum &lt;= 0) {
+        timeQuantum = 20;
+    }</td>
+                <td class="expl-cell">Defensive check: If invalid non-positive quantum is passed, falls back to standard 20-minute time slice.</td>
+            </tr>
+            <tr>
+                <td class="line-num">290–301</td>
+                <td class="code-cell">class RRTaskState {
+    final ProcessTaskDto original;
+    int remainingBurst;
+    int completionTime;
+    boolean inQueue;
+    ...
+}</td>
+                <td class="expl-cell">
+                    Round Robin state wrapper. The <code>boolean inQueue</code> flag is crucial: it prevents the same process from being added to the ready queue multiple times simultaneously.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">309–311</td>
+                <td class="code-cell">states.sort(Comparator.comparingInt(s -> s.original.getArrivalTime()));
+Queue&lt;RRTaskState&gt; readyQueue = new LinkedList&lt;&gt;();</td>
+                <td class="expl-cell">Sorts processes by arrival time initially and instantiates the FIFO <code>Queue</code> representing the OS Ready Queue.</td>
+            </tr>
+            <tr>
+                <td class="line-num">317–322</td>
+                <td class="code-cell">for (RRTaskState s : states) {
+    if (s.original.getArrivalTime() &lt;= currentTime &amp;&amp; !s.inQueue) {
+        readyQueue.add(s);
+        s.inQueue = true;
+    }
+}</td>
+                <td class="expl-cell">Enqueues all processes that are present at initial time $t=0$.</td>
+            </tr>
+            <tr>
+                <td class="line-num">348–350</td>
+                <td class="code-cell">RRTaskState current = readyQueue.poll();
+current.inQueue = false;</td>
+                <td class="expl-cell">De-queues the head process from the ready queue for execution.</td>
+            </tr>
+            <tr>
+                <td class="line-num">352–356</td>
+                <td class="code-cell">int slice = Math.min(current.remainingBurst, timeQuantum);
+int startTime = currentTime;
+int endTime = startTime + slice;
+currentTime = endTime;
+current.remainingBurst -= slice;</td>
+                <td class="expl-cell">
+                    <strong>Time Quantum Allocation:</strong> The process executes for <code>slice = min(remainingBurst, timeQuantum)</code>. If remaining burst is 5 min and quantum is 20, it runs for 5 min. Clock advances to <code>endTime</code>.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">358–365</td>
+                <td class="code-cell">// CRITICAL OS RULE: Enqueue new arrivals BEFORE re-adding current
+for (RRTaskState s : states) {
+    if (s != current &amp;&amp; s.remainingBurst &gt; 0 
+            &amp;&amp; s.original.getArrivalTime() &lt;= currentTime &amp;&amp; !s.inQueue) {
+        readyQueue.add(s);
+        s.inQueue = true;
+    }
+}</td>
+                <td class="expl-cell">
+                    <strong>Crucial OS Rule for Viva:</strong> Any newly arrived processes during this time slice must be enqueued <strong>before</strong> the preempted process is placed back into the queue. This preserves strict FIFO fairness.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">367–379</td>
+                <td class="code-cell">if (current.remainingBurst &gt; 0) {
+    readyQueue.add(current);
+    current.inQueue = true;
+    ganttChart.add(new GanttBlockDto(..., "Slice", startTime, endTime));
+} else {
+    current.completionTime = currentTime;
+    completed++;
+    ganttChart.add(new GanttBlockDto(..., "Completed", startTime, endTime));
+}</td>
+                <td class="expl-cell">
+                    If process still has remaining burst, re-enqueues it at the tail and logs a "Slice" block. Otherwise, marks <code>completionTime</code>, increments <code>completed</code>, and logs a "Completed" block.
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- SECTION 5 -->
+    <h2>Section 5: Shortest Job First (SJF / SRTF) (Lines 405 – 526)</h2>
+    <p><span class="meta-badge">Provably Optimal Average Waiting Time</span></p>
+
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th class="line-num">Line(s)</th>
+                <th>Java Source Code</th>
+                <th>Detailed Line-by-Line Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="line-num">466–470</td>
+                <td class="code-cell">SJFState shortest = available.stream()
+        .min(Comparator.comparingInt((SJFState s) -> s.remainingBurst)
+                .thenComparingInt(s -> s.original.getArrivalTime()))
+        .orElse(available.get(0));</td>
+                <td class="expl-cell"><strong>SJF Selection Rule:</strong> Always selects the process with the smallest remaining burst time. In preemptive mode (SRTF), newly arrived shorter jobs preempt longer ones.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- SECTION 6 -->
+    <h2>Section 6: Helper Methods & Default Hospital Data (Lines 528 – 585)</h2>
+
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th class="line-num">Line(s)</th>
+                <th>Java Source Code</th>
+                <th>Detailed Line-by-Line Explanation</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="line-num">532–550</td>
+                <td class="code-cell">public List&lt;ProcessTaskDto&gt; prepareTasks(List&lt;ProcessTaskDto&gt; tasks) {
+    if (tasks != null &amp;&amp; !tasks.isEmpty()) {
+        ... sanitization loop ...
+        return copy;
+    }
+    return getDefaultHospitalTasks();
+}</td>
+                <td class="expl-cell">
+                    <strong>Defensive Input Sanitizer:</strong><br>
+                    &bull; Enforces minimum burst time of at least 1 min (<code>Math.max(1, burst)</code>).<br>
+                    &bull; Enforces non-negative arrival time (<code>Math.max(0, arrival)</code>).<br>
+                    &bull; If input list is null or empty, falls back to canonical database tasks.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">560–566</td>
+                <td class="code-cell">public List&lt;ProcessTaskDto&gt; getDefaultHospitalTasks() {
+    return Arrays.asList(
+        new ProcessTaskDto("T1", "John Doe (Angioplasty)", 0, 45, 1),
+        new ProcessTaskDto("T2", "Anita Roy (Ventilation)", 10, 30, 2),
+        new ProcessTaskDto("T3", "Robert Smith (Checkup)", 15, 20, 3),
+        new ProcessTaskDto("T4", "Pooja Verma (Trauma)", 25, 50, 1)
+    );
+}</td>
+                <td class="expl-cell">
+                    Defines the canonical benchmark dataset matching <code>oracle_seed.sql</code>. Enables independent unit testing without an active database connection.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">568–580</td>
+                <td class="code-cell">private void addGanttBlock(List&lt;GanttBlockDto&gt; chart, ProcessTaskDto task, int start, int end) {
+    if (start &gt;= end) return;
+    if (!chart.isEmpty()) {
+        GanttBlockDto prev = chart.get(chart.size() - 1);
+        if (prev.getProcessId().equals(task.getProcessId()) &amp;&amp; prev.getEndTime() == start) {
+            prev.setEndTime(end);
+            return;
+        }
+    }
+    chart.add(new GanttBlockDto(...));
+}</td>
+                <td class="expl-cell">
+                    <strong>Intelligent Gantt Block Merging:</strong><br>
+                    In preemptive simulations, a process might execute across multiple consecutive steps without being preempted. This helper merges adjacent blocks of the same process into a single continuous block, preventing fragmented visual charts.
+                </td>
+            </tr>
+            <tr>
+                <td class="line-num">582–584</td>
+                <td class="code-cell">private double roundTwoDecimals(double val) {
+    return Math.round(val * 100.0) / 100.0;
+}</td>
+                <td class="expl-cell">Utility to format floating-point metric averages to 2 decimal places.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- VIVA SUMMARY -->
+    <h2>🎓 Final Evaluator Cheat Sheet for SchedulerService.java</h2>
+    <table class="code-table">
+        <thead>
+            <tr>
+                <th>Evaluator Question</th>
+                <th>Winning Academic Answer</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>"Why is FCFS unsuitable for hospitals?"</strong></td>
+                <td>It causes the <em>Convoy Effect</em>: emergency patients with high urgency wait behind routine long appointments.</td>
+            </tr>
+            <tr>
+                <td><strong>"How does your code prevent Round Robin unfairness?"</strong></td>
+                <td>Lines 358–365 enqueue new arriving tasks <em>before</em> re-adding the preempted task to the ready queue.</td>
+            </tr>
+            <tr>
+                <td><strong>"What happens if no patient is available?"</strong></td>
+                <td>Lines 68–76 record an <code>IDLE</code> Gantt block and fast-forward the clock to avoid infinite loops or crashes.</td>
+            </tr>
+        </tbody>
+    </table>
+
+</body>
+</html>

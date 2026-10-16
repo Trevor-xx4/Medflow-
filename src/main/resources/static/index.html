@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MedFlow - Smart Hospital Resource & Process Management</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <h2>🏥 MedFlow</h2>
+            <span class="subtitle">Smart Hospital Resource & Process Management System</span>
+        </div>
+        <div class="badge">Phase 1: OS Simulation Engine Complete</div>
+    </header>
+
+    <main class="container">
+        <!-- TOP SECTION: HOSPITAL STATUS OVERVIEW -->
+        <section class="section-card">
+            <h3>1. Hospital Resource & Patient Triage Overview</h3>
+            <p class="description">Live snapshot of hospital assets and incoming patients mapped as OS processes.</p>
+            
+            <div class="grid-2col">
+                <!-- Patient Triage Table -->
+                <div class="panel">
+                    <h4>Admitted Patients (Process Queue)</h4>
+                    <table id="patientsTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Age</th>
+                                <th>Triage Priority</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientsBody">
+                            <tr><td colspan="5">Loading mock patient data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Hospital Resources Table -->
+                <div class="panel">
+                    <h4>Scarce Medical Resources (Banker's Vectors)</h4>
+                    <table id="resourcesTable">
+                        <thead>
+                            <tr>
+                                <th>Resource Name</th>
+                                <th>Total Units</th>
+                                <th>Available</th>
+                                <th>Location</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resourcesBody">
+                            <tr><td colspan="4">Loading mock resource data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- MIDDLE SECTION: OS CPU SCHEDULING SIMULATION -->
+        <section class="section-card">
+            <div class="header-action">
+                <h3>2. Process Scheduling Simulation (CPU Scheduling in Triage)</h3>
+                <div class="controls">
+                    <label for="algoSelect">Algorithm:</label>
+                    <select id="algoSelect">
+                        <option value="FCFS">FCFS (First-Come, First-Served)</option>
+                        <option value="PRIORITY">Priority Scheduling (Emergency Preemption)</option>
+                        <option value="ROUND_ROBIN">Round Robin (Time Quantum: 20 min)</option>
+                        <option value="SRTF">SRTF / SJF (Shortest Remaining Time First)</option>
+                    </select>
+                    <button id="btnRunSchedule" class="btn primary">Run Schedule Simulation</button>
+                </div>
+            </div>
+
+            <!-- Gantt Chart Container -->
+            <div class="gantt-container">
+                <h4>Gantt Chart Timeline:</h4>
+                <div id="ganttChart" class="gantt-chart">
+                    <!-- Gantt blocks will be populated by JavaScript -->
+                    <div class="gantt-placeholder">Click 'Run Schedule Simulation' to view the Gantt Chart</div>
+                </div>
+            </div>
+
+            <!-- Performance Metrics Output -->
+            <div id="scheduleMetrics" class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-title">Average Waiting Time</span>
+                    <span id="avgWaitingTime" class="metric-value">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Average Turnaround Time</span>
+                    <span id="avgTurnaroundTime" class="metric-value">--</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Scheduler Status</span>
+                    <span id="schedulerStatus" class="metric-status">Ready</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- BOTTOM SECTION: DEADLOCK & BANKER'S ALGORITHM -->
+        <section class="section-card">
+            <div class="header-action">
+                <h3>3. Deadlock Management & Banker's Algorithm</h3>
+                <div class="controls">
+                    <button id="btnCheckBanker" class="btn secondary">Verify System Safety State</button>
+                    <button id="btnCheckBankerUnsafe" class="btn btn-danger">Simulate Unsafe Deadlock State</button>
+                </div>
+            </div>
+            <p class="description">Tests whether current treatment requests guarantee a safe sequence to avoid hospital resource deadlock.</p>
+
+            <div class="panel">
+                <div id="bankerStatusBox" class="status-box safe">
+                    <h4>Current Safety State: <span id="bankerSafetyText">Pending Verification</span></h4>
+                    <p id="bankerExplanation">Click 'Verify System Safety State' to run Banker's Algorithm check.</p>
+                </div>
+                <div class="safe-sequence-container">
+                    <strong>Calculated Safe Sequence:</strong>
+                    <div id="safeSequenceList" class="sequence-tags">
+                        <span class="tag">No sequence computed yet</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>MedFlow Project-Based Learning &bull; Operating Systems & DBMS Academic Simulation &bull; Phase 1 (40% Complete)</p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>

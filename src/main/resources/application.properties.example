@@ -1,0 +1,29 @@
+# ==============================================================================
+# MedFlow Application Configuration Template
+# Academic PBL: OS & DBMS (Oracle Database Integration)
+# ==============================================================================
+
+# Embedded Web Server Port
+server.port=8080
+
+# Application Name
+spring.application.name=medflow
+
+# ==============================================================================
+# Oracle Database Connection Settings (Phase 2)
+# ==============================================================================
+# URL Format: jdbc:oracle:thin:@[host]:[port]/[service_name]
+# Default for Oracle Free/XE: localhost:1521/FREEPDB1 or localhost:1521/XEPDB1
+spring.datasource.url=jdbc:oracle:thin:@localhost:1521/FREEPDB1
+spring.datasource.username=medflow_admin
+spring.datasource.password=your_password_here
+spring.datasource.driver-class-name=oracle.jdbc.OracleDriver
+
+# ==============================================================================
+# JPA / Hibernate Properties (Phase 2)
+# ==============================================================================
+# 'none' ensures Hibernate does not alter Oracle schema created by oracle_schema.sql
+spring.jpa.hibernate.ddl-auto=none
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.OracleDialect

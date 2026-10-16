@@ -1,0 +1,324 @@
+/* ==============================================================================
+   MedFlow: Smart Hospital Resource & Process Management System
+   Clean, Readable CSS (Phase 1 Wireframe Styling)
+   ============================================================================== */
+
+:root {
+    --primary-color: #0284c7;
+    --primary-hover: #0369a1;
+    --success-bg: #dcfce7;
+    --success-text: #166534;
+    --warning-bg: #fef9c3;
+    --warning-text: #854d0e;
+    --danger-bg: #fee2e2;
+    --danger-text: #991b1b;
+    --bg-color: #f8fafc;
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: var(--card-bg);
+    border-bottom: 2px solid var(--border-color);
+}
+
+.navbar .logo h2 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+}
+
+.navbar .subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.badge {
+    background-color: #e0f2fe;
+    color: #0369a1;
+    padding: 0.35rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+/* CONTAINER */
+.container {
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+/* CARDS */
+.section-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.section-card h3 {
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.section-card .description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+}
+
+.header-action {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+/* GRIDS & PANELS */
+.grid-2col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .grid-2col {
+        grid-template-columns: 1fr;
+    }
+}
+
+.panel {
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 1rem;
+    background-color: #ffffff;
+}
+
+.panel h4 {
+    margin-bottom: 0.75rem;
+    font-size: 1rem;
+    color: var(--primary-color);
+}
+
+/* TABLES */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+}
+
+th, td {
+    padding: 0.6rem 0.75rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border-color);
+}
+
+th {
+    background-color: #f1f5f9;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* CONTROLS & BUTTONS */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+select {
+    padding: 0.45rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: #ffffff;
+    font-size: 0.9rem;
+}
+
+.btn {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s ease;
+}
+
+.btn.primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+.btn.primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn.secondary {
+    background-color: #334155;
+    color: #ffffff;
+}
+
+.btn.secondary:hover {
+    background-color: #1e293b;
+}
+
+.btn.btn-danger {
+    background-color: #dc2626;
+    color: #ffffff;
+}
+
+.btn.btn-danger:hover {
+    background-color: #b91c1c;
+}
+
+/* GANTT CHART CONTAINER */
+.gantt-container {
+    margin: 1.5rem 0;
+}
+
+.gantt-chart {
+    display: flex;
+    border: 2px solid var(--primary-color);
+    border-radius: 6px;
+    background: #f8fafc;
+    min-height: 70px;
+    align-items: center;
+    padding: 0.5rem;
+    overflow-x: auto;
+    gap: 4px;
+}
+
+.gantt-placeholder {
+    color: var(--text-secondary);
+    font-style: italic;
+    width: 100%;
+    text-align: center;
+    padding: 1rem;
+}
+
+.gantt-block {
+    background-color: #38bdf8;
+    color: #0f172a;
+    border: 1px solid #0284c7;
+    border-radius: 4px;
+    padding: 0.5rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+    min-width: 120px;
+}
+
+/* METRICS GRID */
+.metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.metric-card {
+    background: #f8fafc;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.metric-title {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.metric-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-top: 0.25rem;
+}
+
+.metric-status {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #16a34a;
+    margin-top: 0.25rem;
+}
+
+/* BANKER'S STATUS BOX */
+.status-box {
+    padding: 1rem;
+    border-radius: 6px;
+    margin-bottom: 1rem;
+}
+
+.status-box.safe {
+    background-color: var(--success-bg);
+    color: var(--success-text);
+    border: 1px solid #bbf7d0;
+}
+
+.status-box.unsafe {
+    background-color: var(--danger-bg);
+    color: var(--danger-text);
+    border: 1px solid #fecaca;
+}
+
+.safe-sequence-container {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    font-size: 0.9rem;
+}
+
+.sequence-tags {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background-color: #e2e8f0;
+    color: #1e293b;
+    padding: 0.35rem 0.65rem;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.8rem;
+}
+
+/* FOOTER */
+.footer {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border-color);
+}
